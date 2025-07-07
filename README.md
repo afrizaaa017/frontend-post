@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# Frontend Post (Next.js)
 
-First, run the development server:
+Aplikasi ini adalah frontend berbasis Next.js yang digunakan untuk menampilkan dan mengelola postingan. Aplikasi ini terhubung dengan backend melalui proxy API yang telah dikonfigurasi pada file `next.config.mjs`.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Fitur Utama
+- Menampilkan daftar artikel dan postingan
+- Melihat detail postingan berdasarkan ID
+- Proxy API ke backend (http://127.0.0.1:3030/postings)
+
+## Struktur Folder
+- `pages/` : Halaman utama aplikasi
+  - `postingan/` : Halaman daftar dan detail postingan
+- `public/` : Asset publik (ikon, gambar, dll)
+- `src/app/` : File global, layout, dan halaman utama
+
+## Konfigurasi Proxy API
+Pada file `next.config.mjs`, terdapat konfigurasi rewrite agar permintaan ke `/api/:path*` diteruskan ke backend di `http://127.0.0.1:3030/postings/:path*`.
+
+```js
+// next.config.mjs
+const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://127.0.0.1:3030/postings/:path*',
+      },
+    ];
+  },
+};
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Menjalankan Aplikasi
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Jalankan aplikasi:
+   ```bash
+   npm run dev
+   ```
+3. Buka browser ke [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Catatan
+- Pastikan backend berjalan di `http://127.0.0.1:3030` agar proxy API berfungsi.
+- Aplikasi ini dapat dikembangkan lebih lanjut sesuai kebutuhan.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Created for academic purposes.
