@@ -3,6 +3,14 @@
 
 Aplikasi ini adalah frontend berbasis Next.js yang digunakan untuk menampilkan dan mengelola postingan. Aplikasi ini terhubung dengan backend melalui proxy API yang telah dikonfigurasi pada file `next.config.mjs`.
 
+## Versi yang Digunakan
+
+- **Next.js**: 14.x.x
+- **React**: 18.x.x
+- **Axios**: 1.x.x
+- **Node.js**: 18.x.x atau lebih baru
+- (Lihat detail versi lain di `package.json`)
+
 ## Fitur Utama
 - Menampilkan daftar artikel dan postingan
 - Melihat detail postingan berdasarkan ID
@@ -10,7 +18,7 @@ Aplikasi ini adalah frontend berbasis Next.js yang digunakan untuk menampilkan d
 
 ## Struktur Folder
 - `pages/` : Halaman utama aplikasi
-  - `postingan/` : Halaman daftar dan detail postingan
+  - `postings/` : Halaman daftar dan detail postingan
 - `public/` : Asset publik (ikon, gambar, dll)
 - `src/app/` : File global, layout, dan halaman utama
 
@@ -40,7 +48,7 @@ const nextConfig = {
    ```bash
    npm run dev
    ```
-3. Buka browser ke [http://localhost:3000](http://localhost:3000)
+3. Buka browser ke [http://localhost:3000](http://localhost:3000), dan akses endpoint `/postings` untuk menggunakan fitur postingan.
 
 ## Catatan
 - Pastikan backend berjalan di `http://127.0.0.1:3030` agar proxy API berfungsi.
