@@ -1,7 +1,15 @@
 // pages/posts/index.js
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import Link from 'next/link';
+import PostinganCard from '../../components/post/PostinganCard';
+import PostinganForm from '../../components/post/PostinganForm';
+import PartialUpdateForm from '../../components/post/PartialUpdateForm';
+import {
+  getAllPostings,
+  createPosting,
+  deletePosting,
+  getPostingCount,
+  patchPosting
+} from '../../api/postingan';
 
 const cardStyle = {
   background: '#fff',
@@ -40,15 +48,26 @@ export default function PostingList() {
   const [postings, setPostings] = useState([]);
   const [form, setForm] = useState({ title: '', content: '' });
   const [isMounted, setIsMounted] = useState(false);
+  const [count, setCount] = useState(0);
+  const [bulkContent, setBulkContent] = useState('');
+  const [patchId, setPatchId] = useState('');
+  const [patchTitle, setPatchTitle] = useState('');
+  const [patchContent, setPatchContent] = useState('');
 
   useEffect(() => {
     setIsMounted(true);
     fetchPostings();
+    fetchCount();
   }, []);
 
   const fetchPostings = async () => {
-    const res = await axios.get('/api/');
-    setPostings(res.data);
+    const data = await getAllPostings();
+    setPostings(data);
+  };
+
+  const fetchCount = async () => {
+    const res = await getPostingCount();
+    setCount(res.count);
   };
 
   const handleChange = e => {
@@ -57,70 +76,71 @@ export default function PostingList() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    await axios.post('/api/', form);
+    await createPosting(form);
     setForm({ title: '', content: '' });
     fetchPostings();
+    fetchCount();
   };
 
   const handleDelete = async id => {
-    await axios.delete(`/api/${id}`);
+    await deletePosting(id);
+    fetchPostings();
+    fetchCount();
+  };
+
+  // Partial update postingan by id (PATCH /postings/{id})
+  const handlePatch = async e => {
+    e.preventDefault();
+    if (!patchId) return;
+    const data = {};
+    if (patchTitle) data.title = patchTitle;
+    if (patchContent) data.content = patchContent;
+    await patchPosting(patchId, data);
+    setPatchId('');
+    setPatchTitle('');
+    setPatchContent('');
     fetchPostings();
   };
 
   return (
     <div style={{ padding: '2rem', background: '#f6f8fa', minHeight: '100vh' }}>
       <h1 style={{ textAlign: 'center', color: '#0070f3', marginBottom: '2rem' }}>Daftar Posting</h1>
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        <b>Total Posting:</b> {count}
+      </div>
 
-      <form onSubmit={handleSubmit} style={{
-        background: '#fff',
-        borderRadius: '10px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-        padding: '1.5rem',
-        maxWidth: 500,
-        margin: '0 auto 2rem auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.5rem'
-      }}>
-        <input
-          name="title"
-          placeholder="Judul"
-          value={form.title}
-          onChange={handleChange}
-          required
-          style={inputStyle}
-        />
-        <textarea
-          name="content"
-          placeholder="Konten"
-          value={form.content}
-          onChange={handleChange}
-          required
-          style={{ ...inputStyle, minHeight: 80 }}
-        />
-        <button type="submit" style={btnAdd}>Tambah Posting</button>
-      </form>
+      <PostinganForm
+        form={form}
+        onChange={handleChange}
+        onSubmit={handleSubmit}
+        inputStyle={inputStyle}
+        btnAdd={btnAdd}
+      />
+
+      {/* Partial update postingan by id */}
+      <PartialUpdateForm
+        patchId={patchId}
+        setPatchId={setPatchId}
+        patchTitle={patchTitle}
+        setPatchTitle={setPatchTitle}
+        patchContent={patchContent}
+        setPatchContent={setPatchContent}
+        onPatch={handlePatch}
+        inputStyle={inputStyle}
+        btnEdit={btnEdit}
+      />
 
       <div style={{ maxWidth: 700, margin: '0 auto' }}>
         {isMounted && postings.length === 0 && (
           <div style={{ textAlign: 'center', color: '#888', marginTop: 40 }}>Belum ada postingan.</div>
         )}
         {isMounted && postings.map(posting => (
-          <div
+          <PostinganCard
             key={posting.id}
-            style={cardStyle}
-            onMouseOver={e => e.currentTarget.style.boxShadow = cardHover.boxShadow}
-            onMouseOut={e => e.currentTarget.style.boxShadow = cardStyle.boxShadow}
-          >
-            <div style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: 6 }}>{posting.title}</div>
-            <div style={{ color: '#444', marginBottom: 12 }}>{posting.content}</div>
-            <div>
-              <Link href={`/postings/${posting.id}`} legacyBehavior>
-                <a style={btnEdit}>✏️ Edit</a>
-              </Link>
-              <button style={btnDelete} onClick={() => handleDelete(posting.id)}>🗑️ Delete</button>
-            </div>
-          </div>
+            postingan={posting}
+            onEdit={() => window.location.href = `/postings/${posting.id}`}
+            onDelete={handleDelete}
+          />
         ))}
       </div>
     </div>

@@ -29,7 +29,7 @@ export default function EditPosting() {
   const handleSubmit = async e => {
     e.preventDefault();
     await axios.put(`/api/${id}`, posting);
-    router.push('/postingan');
+    router.push('/postings');
   };
 
   const cardStyle = {
